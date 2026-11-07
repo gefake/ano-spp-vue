@@ -30,3 +30,13 @@ export const images = {
 }
 
 
+
+// Résolution des ressources publiques sous le chemin de déploiement.
+const asset = value => import.meta.env.BASE_URL + value.replace(/^\//, '')
+for (const doc of config.documents) {
+ doc.file = asset(doc.file)
+ doc.pages = doc.pages.map(asset)
+}
+images.hero = asset(images.hero)
+images.donationQr = asset(images.donationQr)
+images.slides = images.slides.map(slide => ({ ...slide, src: /^https?:/.test(slide.src) ? slide.src : asset(slide.src) }))
