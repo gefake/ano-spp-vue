@@ -5,13 +5,20 @@ import ImageSlider from './ImageSlider.vue'
 import DocumentViewer from './DocumentViewer.vue'
 import FieldCompass from './FieldCompass.vue'
 import DonationEquipment from './DonationEquipment.vue'
-const path = ref(location.pathname.replace(/\/$/, '') || '/')
+const base = import.meta.env.BASE_URL
+const url = value => base + value.replace(/^\//, '')
+function readPath() {
+ const pathname = location.pathname
+ const relative = pathname.startsWith(base) ? pathname.slice(base.length) : pathname
+ return '/' + relative.replace(/^\/+|\/+$/g, '')
+}
+const path = ref(readPath())
 const menu = ref(false), copied = ref(false)
 const currentDoc = computed(() => config.documents.find(d => d.path === path.value))
 const home = computed(() => ['/', '/page6', '/about'].includes(path.value))
 const support = computed(() => ['/support', '/payment', '/page9'].includes(path.value))
 const known = computed(() => home.value || support.value || currentDoc.value || ['/documents','/requisites','/page10','/news'].includes(path.value))
-function sync(){ path.value = location.pathname.replace(/\/$/, '') || '/'; menu.value = false }
+function sync(){ path.value = readPath(); menu.value = false }
 function go(url){ history.pushState({}, '', base + url.replace(/^\//, ''));  sync(); window.scrollTo({top:0,behavior:'smooth'}) }
 onMounted(() => window.addEventListener('popstate',sync))
 onUnmounted(() => window.removeEventListener('popstate',sync))
@@ -59,6 +66,7 @@ onUnmounted(() => { window.removeEventListener('scroll',onScroll); cancelAnimati
 </main>
 <footer><div class="wrap footer-main"><a class="brand" :href="url('/')" @click.prevent="go('/')"><span>АНО СПП</span></a><a :href="url('/documents')" @click.prevent="go('/documents')">Документы и реквизиты ↗</a></div><div class="wrap footer-bottom"><span>© {{new Date().getFullYear()}} АНО «СПП»</span><a :href="url('/personal')" @click.prevent="go('/personal')">Персональные данные</a><a :href="url('/oferta')" @click.prevent="go('/oferta')">Оферта</a></div></footer>
 </template>
+
 
 
 
